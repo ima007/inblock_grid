@@ -1,0 +1,126 @@
+/* Modify these to your needs */
+@gridColumns: 12; //Number of columns
+@gridColumnWidth: 60px; //Default column width
+@gridGutterWidth: 20px; //Default gutter width
+@maxContainerWidth:980px;
+@minContaienrWidth:480px;
+
+
+
+/* usage 
+
+	.container()
+		.inner-container()
+			.row()
+				.column()
+				.column()
+				.column()
+			.row()
+				.column()
+				.column()
+				.column()
+
+*/
+
+
+.inline-block(@verticalAlign:top) {
+	display:inline-block;
+	*display: inline; /* IE7 inline-block hack */
+	*zoom: 1;
+	vertical-align:@verticalAlign;
+}
+
+
+
+@gridRowWidth: (@gridColumns * @gridColumnWidth) 
+				+ (@gridGutterWidth * (@gridColumns - 1));
+
+@fluidGridColumnWidth: percentage(@gridColumnWidth/@gridRowWidth);
+@fluidGridGutterWidth: percentage(@gridGutterWidth/@gridRowWidth);
+
+@column-ie-fix: -(.5 / @gridRowWidth * 100 * 1%);
+
+
+
+//Holds containers
+.container(){
+	width:100%;
+	position: relative;
+}
+
+
+//General container
+.inner-container(){
+	margin:0 auto;
+	max-width:@maxContainerWidth;
+	min-width:@minContaienrWidth;
+}
+
+//Use this to make an element a row
+.row(){
+	display:block;
+	width:100%;
+}
+
+//Use this to make an element a row (with right padding)
+.row(@gutterRight:0){
+	display:block;
+	width:100% - (@fluidGridGutterWidth*@gutterRight);
+}
+
+//A column with no offset, and isn't the first in the row
+.column-margin(@columnOffset,@isFirst) when (@isFirst = false) 
+										and (@columnOffset = 0){
+  margin-left: @fluidGridGutterWidth;
+  *margin-left: @fluidGridGutterWidth + @column-ie-fix;
+}
+
+//A column with no offset, and IS the first column in the row
+.column-margin(@columnOffset,@isFirst) when (@isFirst = true) 
+										and (@columnOffset = 0){
+	margin-left:0;
+	*margin-left:0;
+}
+
+//A column margin with an offset, and isn't the first column in the row
+.column-margin(@columnOffset,@isFirst) when (@isFirst = false) 
+										and (@columnOffset > 0){
+
+	@total-col-offset: (@fluidGridColumnWidth * @columnOffset) 
+						+ (@fluidGridGutterWidth * (@columnOffset - 1)) 
+						+ (@fluidGridGutterWidth*2);
+
+	margin-left: @total-col-offset;
+	*margin-left: @total-col-offset + (@column-ie-fix*2);
+}
+
+//A column margin with an offset, and isn't the first column in the row
+.column-margin(@columnOffset,@isFirst) when (@isFirst = true) 
+										and (@columnOffset > 0){
+
+	@total-col-offset: (@fluidGridColumnWidth * @columnOffset) 
+						+ (@fluidGridGutterWidth * (@columnOffset - 1)) 
+						+ (@fluidGridGutterWidth);
+
+	margin-left: @total-col-offset;
+	*margin-left: @total-col-offset + (@column-ie-fix*2);
+}
+
+//Use this to make an element a column
+.column(@columns,@columnOffset:0,@isFirst:false, @vAlign:top){
+
+	@total-col-width: (@fluidGridColumnWidth * @columns) 
+						+ (@fluidGridGutterWidth * (@columns - 1));
+
+	.inline-block();
+	vertical-align: @vAlign;
+	width:@total-col-width;
+	*width:@total-col-width + @column-ie-fix; 
+	.column-margin(@columnOffset,@isFirst);
+}
+
+//Use columns like this, inside of a css rule
+// .column(5); //no offset, isn't the first
+// .column(5,0, true); //no offset, is the first
+// .column(5,1); // 1 column offset, isn't the first
+// .column(5,1,true); //1 column offset, is the first
