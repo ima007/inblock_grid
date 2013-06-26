@@ -112,8 +112,7 @@
 	@total-col-width: (@fluidGridColumnWidth * @columns) 
 						+ (@fluidGridGutterWidth * (@columns - 1));
 
-	.inline-block();
-	vertical-align: @vAlign;
+	.inline-block(@vAlign);
 	width:@total-col-width;
 	*width:@total-col-width + @column-ie-fix; 
 	.column-margin(@columnOffset,@isFirst);
